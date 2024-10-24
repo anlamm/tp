@@ -58,7 +58,7 @@ public class Ui {
         return in.nextLine();
     }
 
-    public static void printCategory(String category, ArrayList<ArrayList<Contact>> contactListByCategory, ArrayList<String> categoryList) {
+    public static void printCat(String cat, ArrayList<ArrayList<Contact>> listByCat, ArrayList<String> catList) {
         System.out.println("Contacts in category: " + category);
         if (contactListByCategory.get(categoryList.indexOf(category)).isEmpty()) {
             System.out.println("There is no contact in " + category);

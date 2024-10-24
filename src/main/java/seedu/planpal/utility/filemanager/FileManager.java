@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Scanner;
 
 /**
@@ -28,13 +29,13 @@ public class FileManager {
     private final String contactClass = "Contact";
     private final String activityClass = "Activity";
     private final String expenseClass = "Expense";
+    private final String pathToList = "list.txt";
+    private final String pathToCategories = "categories.txt";
     private ArrayList<String> pathToClass = new ArrayList<>();;
     private String pathToStorage;
     private String pathToContacts;
     private String pathToActivities;
     private String pathToExpenses;
-    private String pathToList = "list.txt";
-    private String pathToCategories = "categories.txt";
 
     /**
      * Constructs a FileManager for managing saving and loading of all file.
@@ -105,16 +106,18 @@ public class FileManager {
         }
     }
 
-    public void saveCategories(ArrayList<Contact> list, ArrayList<ArrayList<Contact>> listByCategory, ArrayList<String> categoryList) {
-        if (!listByCategory.isEmpty() && list.get(0) instanceof Storeable) {
+    public void saveCategories(ArrayList<Contact> list, ArrayList<ArrayList<Contact>> listByCategory) {
+        if (!listByCategory.isEmpty()) {
             switch (list.get(0).getClass().getSimpleName()) {
             case contactClass:
                 createDirectory(pathToContacts);
-                try (FileWriter writer = new FileWriter(pathToStorage + "/" + pathToContacts + "/" + pathToCategories)) {
+                String path = pathToStorage + "/" + pathToContacts + "/" + pathToCategories;
+                try (FileWriter writer = new FileWriter(path)) {
                     for (Contact item : list) {
                         ArrayList<String> categories = item.getCategories();
                         writer.write(SET_CATEGORY_COMMAND + "\n");
-                        writer.write(EDIT_COMMAND + " " + list.indexOf(item) + " " + getCategoriesString(categories) + "\n");
+                        String editString = " " + list.indexOf(item) + " " + getCategoriesString(categories) + "\n";
+                        writer.write(EDIT_COMMAND + editString);
                         for (String category : item.getCategories()) {
                             writer.write(SET_CATEGORY_COMMAND + "\n");
                             writer.write(ADD_COMMAND + " " + category + "\n");
@@ -141,9 +144,9 @@ public class FileManager {
         if (categories.isEmpty()) {
             return "";
         }
-        String categoriesString = "";
+        StringBuilder categoriesString = new StringBuilder();
         for (String category : categories) {
-            categoriesString += category + "/";
+            categoriesString.append(category).append("/");
         }
         return categoriesString.substring(0, categoriesString.length() - 1);
     }
@@ -168,7 +171,7 @@ public class FileManager {
             if (!folder.exists()){
                 continue;
             }
-            for (File file : folder.listFiles()) {
+            for (File file : Objects.requireNonNull(folder.listFiles())) {
                 System.setOut(new PrintStream(new OutputStream() {
                     @Override
                     public void write(int b) {}

@@ -134,15 +134,15 @@ public class ContactManager implements ListFunctions<Contact> {
     public boolean handleCategory(String description) throws PlanPalExceptions {
         if (description.startsWith("add ")) {
             addCategory(description);
-            savedContacts.saveCategories(contactList, contactListByCategory, categoryList);
+            savedContacts.saveCategories(contactList, contactListByCategory);
             return false;
         } else if (description.startsWith("remove ")) {
             removeCategory(description);
-            savedContacts.saveCategories(contactList, contactListByCategory, categoryList);
+            savedContacts.saveCategories(contactList, contactListByCategory);
             return false;
         } else if (description.startsWith("edit ")) {
             editCategory(description);
-            savedContacts.saveCategories(contactList, contactListByCategory, categoryList);
+            savedContacts.saveCategories(contactList, contactListByCategory);
             return false;
         } else if (description.equals("view")) {
             Ui.printCategoryList(categoryList);
@@ -239,7 +239,7 @@ public class ContactManager implements ListFunctions<Contact> {
     public void searchCategory(String description) {
         for (String category : categoryList) {
             if (category.equals(description)) {
-                Ui.printCategory(category, contactListByCategory, categoryList);
+                Ui.printCat(category, contactListByCategory, categoryList);
                 return;
             }
         }
