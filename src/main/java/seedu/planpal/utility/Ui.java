@@ -59,13 +59,13 @@ public class Ui {
     }
 
     public static void printCat(String cat, ArrayList<ArrayList<Contact>> listByCat, ArrayList<String> catList) {
-        System.out.println("Contacts in category: " + category);
-        if (contactListByCategory.get(categoryList.indexOf(category)).isEmpty()) {
-            System.out.println("There is no contact in " + category);
+        System.out.println("Contacts in category: " + cat);
+        if (listByCat.get(catList.indexOf(cat)).isEmpty()) {
+            System.out.println("There is no contact in " + cat);
             System.out.println(LINE_SEPARATOR);
         }
         else {
-            for (Contact contact : contactListByCategory.get(categoryList.indexOf(category))) {
+            for (Contact contact : listByCat.get(catList.indexOf(cat))) {
                 System.out.println(contact);
             }
             System.out.println(LINE_SEPARATOR);
