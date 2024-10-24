@@ -13,7 +13,8 @@ public class Parser implements ListFunctions<String> {
 
     private static final String ADD_COMMAND = "add";
     private static final String DELETE_COMMAND = "delete";
-    private static final String SET_CATEGORY_COMMAND = "set";
+    private static final String CATEGORY_COMMAND = "category";
+    private static final String SEARCH_CATEGORY_COMMAND = "search";
     private static final String EDIT_COMMAND = "edit";
     private static final String FIND_COMMAND = "find";
     private static final String LIST_COMMAND = "list";
@@ -50,9 +51,16 @@ public class Parser implements ListFunctions<String> {
                 contactManager.deleteContact(description);
                 break;
 
-            case SET_CATEGORY_COMMAND:
-                String setCommand = Ui.getSetCategory();
-                contactManager.setCategory(setCommand.trim());
+            case CATEGORY_COMMAND:
+                boolean quit = false;
+                while (!quit) {
+                    quit = contactManager.handleCategory(Ui.getSetCategory().trim());
+                }
+                break;
+
+            case SEARCH_CATEGORY_COMMAND:
+                description = inputParts[1].trim();
+                contactManager.searchCategory(description);
                 break;
 
             case LIST_COMMAND:

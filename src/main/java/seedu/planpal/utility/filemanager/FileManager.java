@@ -22,7 +22,7 @@ import java.util.Scanner;
  */
 public class FileManager {
     private static final String ADD_COMMAND = "add";
-    private static final String SET_COMMAND = "set";
+    private static final String SET_CATEGORY_COMMAND = "category";
     private static final String DELETE_COMMAND = "delete";
     private static final String EDIT_COMMAND = "edit";
     private final String contactClass = "Contact";
@@ -105,23 +105,22 @@ public class FileManager {
         }
     }
 
-    public <T> void saveCategories(ArrayList<T> list, ArrayList<ArrayList<T>> listByCategory, ArrayList<String> categoryList) {
+    public void saveCategories(ArrayList<Contact> list, ArrayList<ArrayList<Contact>> listByCategory, ArrayList<String> categoryList) {
         if (!listByCategory.isEmpty() && list.get(0) instanceof Storeable) {
             switch (list.get(0).getClass().getSimpleName()) {
             case contactClass:
                 createDirectory(pathToContacts);
                 try (FileWriter writer = new FileWriter(pathToStorage + "/" + pathToContacts + "/" + pathToCategories)) {
-//                    for (T item : list) {
-//                        if (item instanceof Storeable) {
-//                            ArrayList<String> categories = ((Storeable) item).getCategories();
-//                            writer.write(SET_COMMAND + "\n");
-//                            writer.write(EDIT_COMMAND + " " + list.indexOf(item) + " " + getCategoriesString(categories) + "\n");
-//                            for (String category : categories) {
-//                                writer.write(SET_COMMAND + "\n");
-//                                writer.write(ADD_COMMAND + " " + category + "\n");
-//                            }
-//                        }
-//                    }
+                    for (Contact item : list) {
+                        ArrayList<String> categories = item.getCategories();
+                        writer.write(SET_CATEGORY_COMMAND + "\n");
+                        writer.write(EDIT_COMMAND + " " + list.indexOf(item) + " " + getCategoriesString(categories) + "\n");
+                        for (String category : item.getCategories()) {
+                            writer.write(SET_CATEGORY_COMMAND + "\n");
+                            writer.write(ADD_COMMAND + " " + category + "\n");
+                        }
+                    }
+                    writer.write("quit\n");
                 } catch (IOException e) {
                     Ui.print("Error saving data!");
                 }
@@ -139,6 +138,9 @@ public class FileManager {
     }
 
     private String getCategoriesString(ArrayList<String> categories) {
+        if (categories.isEmpty()) {
+            return "";
+        }
         String categoriesString = "";
         for (String category : categories) {
             categoriesString += category + "/";

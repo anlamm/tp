@@ -1,5 +1,8 @@
 package seedu.planpal.utility;
 
+import seedu.planpal.contacts.Contact;
+
+import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
@@ -47,9 +50,38 @@ public class Ui {
                 "Options : ",
                 "1. add Category type (e.g. add close friend)",
                 "2. remove Category type (e.g. remove emergency)",
-                "3. edit Category of Contact (e.g. edit 1 friend/family)"
+                "3. edit Category of Contact (e.g. edit 1 friend/family, to delete all category: edit 1 /)",
+                "4. view Category lists (e.g. view)",
+                "5. quit"
         );
         Scanner in = new Scanner(System.in);
         return in.nextLine();
+    }
+
+    public static void printCategory(String category, ArrayList<ArrayList<Contact>> contactListByCategory, ArrayList<String> categoryList) {
+        System.out.println("Contacts in category: " + category);
+        if (contactListByCategory.get(categoryList.indexOf(category)).isEmpty()) {
+            System.out.println("There is no contact in " + category);
+            System.out.println(LINE_SEPARATOR);
+        }
+        else {
+            for (Contact contact : contactListByCategory.get(categoryList.indexOf(category))) {
+                System.out.println(contact);
+            }
+            System.out.println(LINE_SEPARATOR);
+        }
+    }
+
+    public static void printCategoryNotFound() {
+        System.out.println("Category not found.");
+        System.out.println(LINE_SEPARATOR);
+    }
+
+    public static void printCategoryList(ArrayList<String> categoryList) {
+        System.out.println(LINE_SEPARATOR);
+        for (String category : categoryList) {
+            System.out.println(category);
+        }
+        System.out.println(LINE_SEPARATOR);
     }
 }

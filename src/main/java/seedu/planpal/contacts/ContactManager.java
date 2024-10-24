@@ -131,17 +131,25 @@ public class ContactManager implements ListFunctions<Contact> {
         }
     }
 
-    public void setCategory(String description) throws PlanPalExceptions {
+    public boolean handleCategory(String description) throws PlanPalExceptions {
         if (description.startsWith("add ")) {
             addCategory(description);
-//            savedContacts.saveCategories(contactList, contactListByCategory, categoryList);
+            savedContacts.saveCategories(contactList, contactListByCategory, categoryList);
+            return false;
         } else if (description.startsWith("remove ")) {
             removeCategory(description);
-//            savedContacts.saveCategories(contactList, contactListByCategory, categoryList);
+            savedContacts.saveCategories(contactList, contactListByCategory, categoryList);
+            return false;
         } else if (description.startsWith("edit ")) {
             editCategory(description);
-//            savedContacts.saveCategories(contactList, contactListByCategory, categoryList);
-        }else {
+            savedContacts.saveCategories(contactList, contactListByCategory, categoryList);
+            return false;
+        } else if (description.equals("view")) {
+            Ui.printCategoryList(categoryList);
+            return false;
+        } else if (description.equals("quit")) {
+            return true;
+        } else {
             CONTACT_LOGGER.warning("Failed to set category: invalid command");
             throw new PlanPalExceptions("Invalid command");
         }
@@ -178,11 +186,19 @@ public class ContactManager implements ListFunctions<Contact> {
     private void editCategory(String description) throws PlanPalExceptions {
         try {
             String descriptionToEdit = description.replace("edit ", "").trim();
-            int contactId = Integer.parseInt(descriptionToEdit.substring(0, descriptionToEdit.indexOf(" ")).trim());
-            String[] categories = descriptionToEdit.substring(descriptionToEdit.indexOf(" ")).trim().split("/");
-            Ui.print(categories);
+            String[] categories;
+            int contactId;
+            if (descriptionToEdit.split(" ").length == 1) {
+                contactId = Integer.parseInt(descriptionToEdit) - 1;
+                categories = null;
+            } else {
+                String contactIdString = descriptionToEdit.substring(0, descriptionToEdit.indexOf(" ")).trim();
+                categories = descriptionToEdit.substring(descriptionToEdit.indexOf(" ")).trim().split("/");
+                contactId = Integer.parseInt(contactIdString) - 1;
+            }
             Contact editingContact = validateEdit(categories, contactId);
             updateCategory(editingContact, categories);
+            Ui.print("successfully assigned categories to Contact id : " + contactId);
         } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
             CONTACT_LOGGER.warning("Invalid input. Throwing EmptyDescriptionException.");
             throw new EmptyDescriptionException();
@@ -190,9 +206,11 @@ public class ContactManager implements ListFunctions<Contact> {
     }
 
     private Contact validateEdit(String[] categories, int contactId) throws PlanPalExceptions {
-        if (categories.length == 0) {
-            CONTACT_LOGGER.warning("Invalid input. Throwing EmptyDescriptionException.");
-            throw new EmptyDescriptionException();
+        if (contactId >= contactList.size() || contactId < 0) {
+            throw new PlanPalExceptions("Invalid contact id");
+        }
+        if (categories == null) {
+            return contactList.get(contactId);
         }
         for (String category : categories) {
             if (!categoryList.contains(category)) {
@@ -205,6 +223,9 @@ public class ContactManager implements ListFunctions<Contact> {
 
     private void updateCategory(Contact editingContact, String[] categories) {
         editingContact.clearCategories();
+        if (categories == null) {
+            return;
+        }
         for (String category : categories) {
             if (!categoryList.contains(category)) {
                 continue;
@@ -213,6 +234,16 @@ public class ContactManager implements ListFunctions<Contact> {
                 editingContact.editCategory(category);
             }
         }
+    }
+
+    public void searchCategory(String description) {
+        for (String category : categoryList) {
+            if (category.equals(description)) {
+                Ui.printCategory(category, contactListByCategory, categoryList);
+                return;
+            }
+        }
+        Ui.printCategoryNotFound();
     }
 
 }

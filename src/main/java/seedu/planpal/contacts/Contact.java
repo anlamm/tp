@@ -18,7 +18,7 @@ public class Contact implements Editable, Storeable {
     private String phone;
     private String email;
     private String commandDescription;
-    private ArrayList<String> categories;
+    private ArrayList<String> categories = new ArrayList<>();
 
     /**
      * Default constructor for Contact.
@@ -166,6 +166,9 @@ public class Contact implements Editable, Storeable {
     }
 
     public void clearCategories() {
-        categories.clear();
+        if (!categories.isEmpty()) {
+            categories.clear();
+        }
     }
+
 }
