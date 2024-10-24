@@ -70,7 +70,6 @@ public class Contact implements Editable, Storeable {
      * @throws PlanPalExceptions If the input is incomplete or improperly formatted.
      * @throws IllegalCommandException If the specified category is not recognized.
      */
-    @Override
     private void setCommandDescription(String field, String val) throws PlanPalExceptions, IllegalCommandException {
         boolean isField = false;
         for (String cat : ContactManager.INFORMATIONFIELDS) {
