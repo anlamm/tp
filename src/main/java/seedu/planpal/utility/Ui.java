@@ -1,5 +1,7 @@
 package seedu.planpal.utility;
 
+import java.util.Scanner;
+
 /**
  * Provides user interface functionalities for the PlanPal application.
  */
@@ -38,5 +40,16 @@ public class Ui {
 
     public static void printCreateStorage(String pathToStorage) {
         print("Created a new storage at ", pathToStorage);
+    }
+
+    public static String getSetCategory() {
+        print(
+                "Options : ",
+                "1. add Category type (e.g. add close friend)",
+                "2. remove Category type (e.g. remove emergency)",
+                "3. edit Category of Contact (e.g. edit 1 friend/family)"
+        );
+        Scanner in = new Scanner(System.in);
+        return in.nextLine();
     }
 }

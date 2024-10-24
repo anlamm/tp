@@ -1,5 +1,6 @@
 package seedu.planpal.utility.filemanager;
 
+import seedu.planpal.contacts.Contact;
 import seedu.planpal.exceptions.PlanPalExceptions;
 import seedu.planpal.utility.Parser;
 import seedu.planpal.utility.Ui;
@@ -21,13 +22,19 @@ import java.util.Scanner;
  */
 public class FileManager {
     private static final String ADD_COMMAND = "add";
+    private static final String SET_COMMAND = "set";
+    private static final String DELETE_COMMAND = "delete";
+    private static final String EDIT_COMMAND = "edit";
     private final String contactClass = "Contact";
     private final String activityClass = "Activity";
     private final String expenseClass = "Expense";
+    private ArrayList<String> pathToClass = new ArrayList<>();;
     private String pathToStorage;
     private String pathToContacts;
     private String pathToActivities;
     private String pathToExpenses;
+    private String pathToList = "list.txt";
+    private String pathToCategories = "categories.txt";
 
     /**
      * Constructs a FileManager for managing saving and loading of all file.
@@ -45,17 +52,23 @@ public class FileManager {
         pathToContacts = contactsPath;
         pathToActivities = activitiesPath;
         pathToExpenses = expensesPath;
+        pathToClass.add(pathToContacts);
+        pathToClass.add(pathToActivities);
+        pathToClass.add(pathToExpenses);
     }
 
     /**
      * Ensures that the directory for the storage path exists.
      * If the directory does not exist, it creates it.
      */
-    private void createDirectory(){
+    private void createDirectory(String path) {
         File directory = new File(pathToStorage);
-
         if (!directory.exists()){
             directory.mkdir();
+        }
+        File folder = new File(pathToStorage + "/" + pathToContacts);
+        if (!folder.exists()){
+            folder.mkdir();
         }
     }
 
@@ -67,11 +80,11 @@ public class FileManager {
      * @param list The list of objects to be saved. Each object must implement {@link Storeable}.
      */
     public <T> void saveList(ArrayList<T> list) {
-        createDirectory();
         if (!list.isEmpty() && list.get(0) instanceof Storeable) {
             switch (list.get(0).getClass().getSimpleName()) {
             case contactClass:
-                try (FileWriter writer = new FileWriter(pathToStorage+ "/" + pathToContacts)) {
+                createDirectory(pathToContacts);
+                try (FileWriter writer = new FileWriter(pathToStorage + "/" + pathToContacts + "/" + pathToList)) {
                     for (T item : list) {
                         String commandDescription = ((Storeable) item).getCommandDescription();
                         writer.write(ADD_COMMAND + " " + commandDescription + "\n");
@@ -92,6 +105,47 @@ public class FileManager {
         }
     }
 
+    public <T> void saveCategories(ArrayList<T> list, ArrayList<ArrayList<T>> listByCategory, ArrayList<String> categoryList) {
+        if (!listByCategory.isEmpty() && list.get(0) instanceof Storeable) {
+            switch (list.get(0).getClass().getSimpleName()) {
+            case contactClass:
+                createDirectory(pathToContacts);
+                try (FileWriter writer = new FileWriter(pathToStorage + "/" + pathToContacts + "/" + pathToCategories)) {
+//                    for (T item : list) {
+//                        if (item instanceof Storeable) {
+//                            ArrayList<String> categories = ((Storeable) item).getCategories();
+//                            writer.write(SET_COMMAND + "\n");
+//                            writer.write(EDIT_COMMAND + " " + list.indexOf(item) + " " + getCategoriesString(categories) + "\n");
+//                            for (String category : categories) {
+//                                writer.write(SET_COMMAND + "\n");
+//                                writer.write(ADD_COMMAND + " " + category + "\n");
+//                            }
+//                        }
+//                    }
+                } catch (IOException e) {
+                    Ui.print("Error saving data!");
+                }
+                break;
+            case activityClass:
+                break;
+            case expenseClass:
+                break;
+            default:
+                Ui.print("Does not recognize object");
+            }
+        } else {
+            Ui.print("Empty list!");
+        }
+    }
+
+    private String getCategoriesString(ArrayList<String> categories) {
+        String categoriesString = "";
+        for (String category : categories) {
+            categoriesString += category + "/";
+        }
+        return categoriesString.substring(0, categoriesString.length() - 1);
+    }
+
     /**
      * Loads a list of objects from each corresponding file in storage.
      * The file is parsed line by line, and each command is processed using the provided {@link Parser}.
@@ -106,21 +160,28 @@ public class FileManager {
         PrintStream out = System.out;
 
         // Redirect System.out to a dummy steam (solution from gpt)
-        for (File file : directory.listFiles()) {
-            System.setOut(new PrintStream(new OutputStream() {
-                @Override
-                public void write(int b) {}
-            }));
-            try (Scanner scanner = new Scanner(file)) {
-                while (scanner.hasNext()) {
-                    parser.processCommand(scanner.nextLine());
-                }
-            } catch (FileNotFoundException | PlanPalExceptions e){
-                Ui.print(e.getMessage());
-            }
-            System.setOut(out);
-            Ui.print("data loaded from " + file.getName());
-        }
 
+        for (String path : pathToClass) {
+            File folder = new File(pathToStorage + "/" + path);
+            if (!folder.exists()){
+                continue;
+            }
+            for (File file : folder.listFiles()) {
+                System.setOut(new PrintStream(new OutputStream() {
+                    @Override
+                    public void write(int b) {}
+                }));
+                try (Scanner scanner = new Scanner(file)) {
+                    while (scanner.hasNext()) {
+                        parser.processCommand(scanner.nextLine());
+                    }
+                } catch (FileNotFoundException | PlanPalExceptions e){
+                    Ui.print(e.getMessage());
+                }
+                System.setOut(out);
+                Ui.print("data loaded from " + file.getName());
+            }
+        }
     }
+
 }

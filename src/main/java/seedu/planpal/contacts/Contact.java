@@ -5,6 +5,7 @@ import seedu.planpal.exceptions.PlanPalExceptions;
 import seedu.planpal.utility.Editable;
 import seedu.planpal.utility.filemanager.Storeable;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 
 /**
  * Represents a contact in the PlanPal application.
@@ -17,6 +18,7 @@ public class Contact implements Editable, Storeable {
     private String phone;
     private String email;
     private String commandDescription;
+    private ArrayList<String> categories;
 
     /**
      * Default constructor for Contact.
@@ -62,31 +64,43 @@ public class Contact implements Editable, Storeable {
      * The method splits the current command description into its categories and updates the
      * category with the new value, if it exists.
      *
-     * @param contactCategory The category whose value needs to be updated (e.g., "name").
-     * @param value The new value for the specified category.
+     * @param field The field whose value needs to be updated (e.g., "name").
+     * @param val The new value for the specified category.
      *
      * @throws PlanPalExceptions If the input is incomplete or improperly formatted.
      * @throws IllegalCommandException If the specified category is not recognized.
      */
-    private void setCommandDescription(String category, String val) throws PlanPalExceptions, IllegalCommandException {
-        boolean isCategory = false;
-        for (String cat : ContactManager.INFORMATIONCATEGORIES) {
-            if (category.equals(cat)) {
-                isCategory = true;
-                if (category.equals("email") && !val.contains("@")) {
-                    throw new PlanPalExceptions("email address is not valid");
-                }
-                try {
-                    Field field = this.getClass().getDeclaredField(category);
-                    field.setAccessible(true);
-                    field.set(this, val);
-                } catch (NoSuchFieldException | IllegalAccessException e) {
-                    throw new PlanPalExceptions(e.getMessage());
-                }
+    private void setCommandDescription(String field, String val) throws PlanPalExceptions, IllegalCommandException {
+        boolean isField = false;
+        for (String cat : ContactManager.INFORMATIONFIELDS) {
+            if (field.equals(cat)) {
+                isField = true;
+                editField(field, val);
             }
         }
-        if (!isCategory) {
+        if (!isField) {
             throw new IllegalCommandException();
+        }
+    }
+
+    /**
+     * Helper function to edit field of Contact
+     *
+     * @param field The field whose value needs to be updated (e.g., "name").
+     * @param val The new value for the specified category.
+     *
+     * @throws PlanPalExceptions If the input is incomplete or improperly formatted.
+     */
+    private void editField(String field, String val) throws PlanPalExceptions {
+        if (field.equals("email") && !val.contains("@")) {
+            throw new PlanPalExceptions("email address is not valid");
+        } 
+        try {
+            Field changeField = this.getClass().getDeclaredField(field);
+            changeField.setAccessible(true);
+            changeField.set(this, val);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new PlanPalExceptions(e.getMessage());
         }
     }
 
@@ -133,15 +147,25 @@ public class Contact implements Editable, Storeable {
         return "[Name = " + name + " Phone = "+ phone + " Email = "+ email + "]";
     }
 
-
     @Override
     public String getCommandDescription() {
         return commandDescription;
+    }
+
+    @Override
+    public ArrayList<String> getCategories() {
+        return categories;
     }
 
     public String getName() {
         return name;
     }
 
+    public void editCategory(String category) {
+        categories.add(category);
+    }
 
+    public void clearCategories() {
+        categories.clear();
+    }
 }

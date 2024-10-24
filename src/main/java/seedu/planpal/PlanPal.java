@@ -16,7 +16,7 @@ public class PlanPal {
         Scanner in = new Scanner(System.in);
 
         // Start up everything required
-        var fileManager = new FileManager("data", "contacts.txt", "activities.txt", "expenses.txt");
+        var fileManager = new FileManager("data", "contacts", "activities", "expenses");
         Parser parser = new Parser(fileManager);
         Ui.printWelcomeMessage();
         fileManager.loadList(parser);
