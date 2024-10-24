@@ -18,14 +18,14 @@ public class Contact implements Editable, Storeable {
     private String phone;
     private String email;
     private String commandDescription;
-    private ArrayList<String> categories = new ArrayList<>();
+    private ArrayList<String> categories;
 
     /**
      * Default constructor for Contact.
      * Primarily used as an identifier for retrieving the storage path in the FileManager class.
      */
     public Contact() {
-        // do nothing (used as an identifier for the fileManager class to get storagePath)
+        categories = new ArrayList<>();
     }
 
     /**
@@ -104,6 +104,10 @@ public class Contact implements Editable, Storeable {
         }
     }
 
+    @Override
+    public void setCommandDescription(String description) {
+        this.commandDescription = description;
+    }
 
     /**
      * Processes an edit command for the contact. This method parses the input string
